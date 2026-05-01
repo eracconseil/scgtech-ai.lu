@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCG Tech AI — L'IA au service de vos processus métier | Luxembourg</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0a1628;--blue:#0f2d5e;--accent:#2563eb;--accent2:#3b82f6;
+  --gold:#c9a84c;--gray:#f0f3f8;--text:#1e293b;--muted:#64748b;--white:#fff;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);overflow-x:hidden;background:var(--white)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--navy);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+#loader.hide{opacity:0;visibility:hidden}
+.loader-logo{font-size:2rem;font-weight:900;color:var(--white);letter-spacing:1px;margin-bottom:8px;animation:pulse 1s ease-in-out infinite}
+.loader-sub{font-size:.7rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:40px}
+.loader-bar-wrap{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loader-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:2px;transition:width .05s linear}
+@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* CURSOR */
+.cur{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s,background .2s;transform:translate(-50%,-50%)}
+.cur-ring{width:32px;height:32px;border:1.5px solid rgba(37,99,235,.5);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s}
+.cur.hov{transform:translate(-50%,-50%) scale(2.5);background:var(--gold)}
+.cur-ring.hov{width:48px;height:48px;border-color:rgba(201,168,76,.6)}
+
+/* LANG SWITCHER */
+.lang-switch{display:flex;gap:4px;align-items:center}
+.lang-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 10px;border-radius:5px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .25s;letter-spacing:.5px;font-family:inherit}
+.lang-btn.active{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.lang-btn:not(.active):hover{border-color:rgba(255,255,255,.5);color:var(--white)}
+
+/* HEADER */
+header{position:fixed;top:0;width:100%;z-index:1000;transition:all .5s}
+header.scrolled{background:rgba(10,22,40,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+nav{max-width:1200px;margin:0 auto;padding:0 40px;display:flex;justify-content:space-between;align-items:center;height:72px;gap:1rem}
+.logo{display:flex;flex-direction:column;line-height:1.15}
+.logo-main{font-size:1.2rem;font-weight:900;color:var(--white);letter-spacing:.5px}
+.logo-sub{font-size:.58rem;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase}
+.nav-links{display:flex;list-style:none;gap:1.5rem}
+.nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.85rem;font-weight:500;position:relative;transition:color .2s}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .35s}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-cta{background:var(--accent);color:var(--white);padding:9px 18px;border-radius:6px;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .3s;white-space:nowrap}
+.nav-cta:hover{box-shadow:0 6px 20px rgba(37,99,235,.5);transform:translateY(-1px)}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--navy);position:relative;display:flex;align-items:center;overflow:hidden}
+canvas#ptc{position:absolute;inset:0}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(37,99,235,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.04) 1px,transparent 1px);background-size:64px 64px;animation:gridDrift 25s linear infinite}
+@keyframes gridDrift{to{transform:translateY(64px)}}
+.hero-orb1{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(37,99,235,.18) 0%,transparent 65%);top:-200px;right:-150px;animation:orbFloat 7s ease-in-out infinite}
+.hero-orb2{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 65%);bottom:-100px;left:50px;animation:orbFloat 9s ease-in-out infinite reverse}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.05)}}
+.hero-inner{max-width:1200px;margin:0 auto;padding:0 40px;position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:7px 16px;border-radius:30px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem}
+.badge-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-size:3rem;font-weight:900;color:var(--white);line-height:1.15;margin-bottom:1.2rem;letter-spacing:-.5px}
+.typed-text{color:transparent;background:linear-gradient(135deg,var(--accent2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.typed-cursor{color:var(--gold);animation:blink 1s infinite;font-weight:300}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.65);margin-bottom:1.5rem;line-height:1.8;max-width:460px}
+.hero-intro{background:rgba(255,255,255,.04);border-left:2px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:2rem;font-size:.86rem;color:rgba(255,255,255,.68);line-height:1.8;max-width:480px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-p{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:var(--white);padding:14px 26px;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;transition:all .3s;position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:inherit}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(37,99,235,.45)}
+.btn-o{background:transparent;color:var(--white);padding:14px 26px;border-radius:8px;border:1px solid rgba(255,255,255,.25);font-weight:600;font-size:.9rem;text-decoration:none;transition:all .3s}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-3px)}
+.hero-cards{display:flex;flex-direction:column;gap:10px}
+.hc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:default;position:relative;overflow:hidden;transition:all .4s}
+.hc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--accent),var(--gold));transform:scaleY(0);transition:transform .4s;transform-origin:bottom}
+.hc:hover::before{transform:scaleY(1)}
+.hc:hover{background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.3);transform:translateX(6px)}
+.hc-ico{font-size:1.3rem;min-width:28px;text-align:center}
+.hc-t{font-weight:700;color:var(--white);font-size:.87rem;margin-bottom:2px}
+.hc-d{font-size:.75rem;color:rgba(255,255,255,.45);line-height:1.4}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.25);font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;z-index:2;cursor:pointer;transition:color .3s}
+.hero-scroll:hover{color:rgba(255,255,255,.5)}
+.scroll-mouse{width:22px;height:36px;border:1.5px solid rgba(255,255,255,.2);border-radius:20px;position:relative}
+.scroll-dot{width:4px;height:4px;background:rgba(255,255,255,.4);border-radius:50%;position:absolute;top:8px;left:50%;transform:translateX(-50%);animation:scrollDot 2s ease-in-out infinite}
+@keyframes scrollDot{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(14px)}}
+
+/* COUNTERS */
+.counters{background:linear-gradient(135deg,var(--navy),var(--blue));padding:56px 40px}
+.counters-in{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center}
+.cnt{position:relative}
+.cnt::after{content:'';position:absolute;top:50%;right:0;width:1px;height:40px;transform:translateY(-50%);background:rgba(255,255,255,.1)}
+.cnt:last-child::after{display:none}
+.cnt-val{font-size:2.8rem;font-weight:900;line-height:1;margin-bottom:6px;background:linear-gradient(135deg,var(--white),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cnt-suf{font-size:1.8rem}
+.cnt-lbl{font-size:.78rem;color:rgba(255,255,255,.45);letter-spacing:.5px}
+
+/* SECTION */
+section{padding:90px 40px}
+.si{max-width:1200px;margin:0 auto}
+.stag{display:inline-block;background:rgba(37,99,235,.08);color:var(--accent);padding:5px 14px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1rem}
+.stit{font-size:2rem;font-weight:900;color:var(--navy);margin-bottom:.8rem;letter-spacing:-.3px}
+.sdesc{font-size:.97rem;color:var(--muted);max-width:580px;line-height:1.75;margin-bottom:3rem}
+
+/* PROBLEMS */
+.problems{background:var(--gray)}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.pc{background:var(--white);border-radius:14px;padding:28px;border:1px solid #e2e8f0;transition:all .4s;cursor:default;position:relative;overflow:hidden}
+.pc-line{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transition:transform .45s;transform-origin:left}
+.pc:hover .pc-line{transform:scaleX(1)}
+.pc:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(15,31,61,.1)}
+.pc-ico{font-size:1.9rem;margin-bottom:14px;display:block;transition:transform .3s}
+.pc:hover .pc-ico{transform:scale(1.18) rotate(-5deg)}
+.pc h3{font-size:.95rem;font-weight:800;color:var(--navy);margin-bottom:7px}
+.pc p{font-size:.84rem;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.pc-sol{font-size:.79rem;font-weight:700;color:var(--accent)}
+
+/* TABS */
+.usecases{background:var(--white)}
+.tabs{display:flex;gap:8px;margin-bottom:2.5rem;flex-wrap:wrap}
+.tab{padding:10px 20px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .3s;background:var(--white);color:var(--muted);font-family:inherit}
+.tab.active{background:var(--accent);color:var(--white);border-color:var(--accent);box-shadow:0 8px 20px rgba(37,99,235,.25);transform:translateY(-2px)}
+.tab:not(.active):hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.tab-panel{display:none;animation:tabIn .35s ease}
+.tab-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@keyframes tabIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.uci{background:var(--gray);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;border:1px solid transparent;transition:all .35s;cursor:default}
+.uci:hover{background:rgba(37,99,235,.05);border-color:rgba(37,99,235,.15);transform:translateX(5px)}
+.uci-ico{font-size:1.2rem;min-width:24px}
+.uci-txt{font-size:.86rem;color:var(--text);line-height:1.5;font-weight:500}
+
+/* METHODOLOGY */
+.methodology{background:var(--navy);position:relative;overflow:hidden}
+.mgl{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.methodology .stag{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.methodology .stit{color:var(--white)}
+.methodology .sdesc{color:rgba(255,255,255,.5)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps-line{position:absolute;top:40px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(37,99,235,.5),var(--accent),rgba(37,99,235,.5),transparent)}
+.stp{text-align:center;padding:20px 16px;position:relative;z-index:1;cursor:default}
+.stp-n{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;margin:0 auto 18px;transition:all .35s;box-shadow:0 0 0 0 rgba(37,99,235,.3)}
+.stp:hover .stp-n{box-shadow:0 0 0 12px rgba(37,99,235,.15);transform:scale(1.12)}
+.stp h3{font-size:.92rem;font-weight:800;color:var(--white);margin-bottom:8px}
+.stp p{font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.6}
+
+/* OFFERS */
+.offers{background:var(--gray)}
+.og{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.ofc{background:var(--white);border-radius:16px;padding:36px 28px;border:1px solid #e2e8f0;transition:all .45s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.ofc-top-bar{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.ofc.feat .ofc-top-bar,.ofc:hover .ofc-top-bar{transform:scaleX(1)}
+.ofc.feat{border-color:rgba(37,99,235,.25);border-width:1.5px}
+.ofc:hover{transform:translateY(-8px);box-shadow:0 28px 60px rgba(15,31,61,.12)}
+.feat-badge{position:absolute;top:18px;right:18px;background:rgba(37,99,235,.1);color:var(--accent);font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.ofc-num{font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.ofc h3{font-size:1.2rem;font-weight:900;color:var(--navy);margin-bottom:8px}
+.ofc-desc{font-size:.86rem;color:var(--muted);margin-bottom:20px;line-height:1.7}
+.ofc-feats{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:auto;padding-bottom:24px}
+.ofc-feats li{font-size:.84rem;color:var(--text);display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.fchk{width:18px;height:18px;min-width:18px;background:rgba(37,99,235,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--accent);font-weight:700;margin-top:1px}
+.obtn{display:block;text-align:center;padding:12px;border-radius:8px;font-weight:700;font-size:.87rem;text-decoration:none;transition:all .3s;margin-top:24px}
+.obtn-o{border:1.5px solid var(--accent);color:var(--accent)}
+.obtn-o:hover{background:var(--accent);color:var(--white)}
+.obtn-f{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--white)}
+.obtn-f:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.35)}
+.onote{font-size:.75rem;color:var(--muted);text-align:center;margin-top:8px}
+
+/* WHY */
+.why{background:var(--white)}
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.wc{padding:28px;border-radius:14px;background:var(--gray);border:1px solid #e2e8f0;transition:all .4s;cursor:default;overflow:hidden;position:relative}
+.wc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(37,99,235,.05),transparent);opacity:0;transition:opacity .4s}
+.wc:hover::after{opacity:1}
+.wc:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(15,31,61,.08);border-color:rgba(37,99,235,.2)}
+.wc-ico{font-size:1.9rem;margin-bottom:13px;display:block;transition:transform .3s;position:relative;z-index:1}
+.wc:hover .wc-ico{transform:scale(1.2) rotate(-6deg)}
+.wc h3{font-size:.93rem;font-weight:800;color:var(--navy);margin-bottom:7px;position:relative;z-index:1}
+.wc p{font-size:.83rem;color:var(--muted);line-height:1.65;position:relative;z-index:1}
+
+/* CASES */
+.cases{background:var(--gray)}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.cc{background:var(--white);border-radius:14px;padding:28px;border:1px solid #e2e8f0;transition:all .4s;overflow:hidden;position:relative}
+.cc-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold))}
+.cc:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(15,31,61,.1)}
+.cc-sec{font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:9px}
+.cc h3{font-size:.95rem;font-weight:800;color:var(--navy);margin-bottom:9px}
+.cc p{font-size:.84rem;color:var(--muted);line-height:1.65}
+.cc-res{margin-top:14px;background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(59,130,246,.04));border-radius:8px;padding:11px 14px;font-size:.82rem;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:8px}
+
+/* CTA / FORM */
+.cta-f{background:var(--navy);position:relative;overflow:hidden;text-align:center}
+.cta-bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(37,99,235,.2) 0%,transparent 65%)}
+.cta-f h2{font-size:2.2rem;font-weight:900;color:var(--white);margin-bottom:1rem;position:relative;z-index:1}
+.cta-f>div>p{font-size:1rem;color:rgba(255,255,255,.6);max-width:600px;margin:0 auto 2rem;line-height:1.8;position:relative;z-index:1}
+.cta-contacts{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1;margin-top:3rem}
+.ctact{display:flex;flex-direction:column;align-items:center;gap:5px}
+.ctact span{font-size:.78rem;color:rgba(255,255,255,.35);letter-spacing:.5px}
+.ctact a{font-size:.88rem;color:rgba(255,255,255,.75);text-decoration:none;font-weight:500;transition:color .2s}
+.ctact a:hover{color:var(--white)}
+.diag-form{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:36px;margin:0 auto 2rem;max-width:760px;text-align:left;position:relative;z-index:1}
+.form-grid{display:flex;flex-direction:column;gap:18px}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fi-wrap{display:flex;flex-direction:column;gap:7px}
+.fi-wrap label{font-size:.78rem;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.8px;text-transform:uppercase}
+.fi-wrap .opt{font-weight:400;text-transform:none;letter-spacing:0;opacity:.6}
+.fi-wrap input,.fi-wrap textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:11px 14px;color:var(--white);font-size:.9rem;font-family:inherit;transition:all .3s;outline:none;resize:vertical}
+.fi-wrap input::placeholder,.fi-wrap textarea::placeholder{color:rgba(255,255,255,.25)}
+.fi-wrap input:focus,.fi-wrap textarea:focus{border-color:rgba(37,99,235,.6);background:rgba(37,99,235,.08);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.dept-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:7px 16px;color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;font-family:inherit}
+.chip:hover{border-color:rgba(37,99,235,.5);color:var(--white)}
+.chip.selected{background:rgba(37,99,235,.25);border-color:var(--accent);color:var(--white)}
+.submit-btn{border:none;cursor:pointer;width:100%}
+.form-note{font-size:.75rem;color:rgba(255,255,255,.3);text-align:center;margin-top:10px;letter-spacing:.3px}
+.form-error{background:rgba(220,53,69,.15);border:1px solid rgba(220,53,69,.4);color:#ff8a8a;border-radius:8px;padding:10px 14px;font-size:.84rem;margin-bottom:10px;width:100%}
+.diag-success{background:rgba(255,255,255,.04);border:1px solid rgba(37,99,235,.3);border-radius:16px;padding:48px 36px;margin:0 auto 2rem;max-width:600px;text-align:center;position:relative;z-index:1;animation:fadeUp .5s ease}
+.success-ico{font-size:3rem;margin-bottom:16px}
+.diag-success h3{font-size:1.5rem;font-weight:900;color:var(--white);margin-bottom:12px}
+.diag-success p{font-size:.95rem;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:8px}
+.diag-success a{color:var(--accent2);text-decoration:none}
+
+/* FOOTER */
+footer{background:#050d1a;color:rgba(255,255,255,.45);padding:60px 40px 28px}
+.fi{max-width:1200px;margin:0 auto}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.flm{font-size:1.1rem;color:var(--white);font-weight:900;display:block;margin-bottom:2px}
+.fls{font-size:.58rem;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;display:block;margin-bottom:14px}
+.fb p{font-size:.8rem;line-height:1.7;margin-bottom:16px}
+.fsoc{display:flex;gap:8px}
+.soc{width:34px;height:34px;border:1px solid rgba(255,255,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);text-decoration:none;font-size:.78rem;transition:all .3s}
+.soc:hover{border-color:var(--accent);color:var(--white);background:rgba(37,99,235,.15)}
+.fc h4{color:var(--white);font-size:.8rem;font-weight:700;margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase}
+.fc ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.fc li a{font-size:.78rem;color:rgba(255,255,255,.35);text-decoration:none;transition:all .25s}
+.fc li a:hover{color:rgba(255,255,255,.8);padding-left:4px}
+.fbot{border-top:1px solid rgba(255,255,255,.06);padding-top:22px;display:flex;justify-content:space-between;align-items:center;font-size:.73rem;flex-wrap:wrap;gap:10px}
+.flegal{display:flex;gap:1.5rem}
+.flegal a{color:rgba(255,255,255,.28);text-decoration:none;transition:color .2s}
+.flegal a:hover{color:rgba(255,255,255,.6)}
+
+/* ANIMATIONS */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .65s cubic-bezier(.23,1,.32,1),transform .65s cubic-bezier(.23,1,.32,1)}
+.rv.show{opacity:1;transform:translateY(0)}
+.rv-l{opacity:0;transform:translateX(-30px);transition:opacity .65s cubic-bezier(.23,1,.32,1),transform .65s cubic-bezier(.23,1,.32,1)}
+.rv-l.show{opacity:1;transform:translateX(0)}
+.rv-r{opacity:0;transform:translateX(30px);transition:opacity .65s cubic-bezier(.23,1,.32,1),transform .65s cubic-bezier(.23,1,.32,1)}
+.rv-r.show{opacity:1;transform:translateX(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-inner,.tab-panel.active,.pg,.og,.wg,.cg{grid-template-columns:1fr 1fr}
+  .hero-cards{display:none}
+  .steps{grid-template-columns:1fr 1fr}.steps-line{display:none}
+  .counters-in{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  section{padding:70px 20px}
+  .hero h1{font-size:2rem}
+  .pg,.og,.wg,.cg,.tab-panel.active,.steps,.counters-in{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr}
+  nav{padding:0 20px}
+  .fg-row{grid-template-columns:1fr}
+  .diag-form{padding:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">SCG Tech AI</div>
+  <div class="loader-sub">Cabinet BPM & Intelligence Artificielle</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="lbar"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+
+<!-- HEADER -->
+<header id="hdr">
+  <nav>
+    <div class="logo">
+      <span class="logo-main">SCG Tech AI</span>
+      <span class="logo-sub" data-fr="Cabinet BPM & Intelligence Artificielle" data-en="BPM & Artificial Intelligence Firm">Cabinet BPM & Intelligence Artificielle</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#problemes" data-fr="Enjeux" data-en="Challenges">Enjeux</a></li>
+      <li><a href="#usecases" data-fr="Cas d'usage" data-en="Use Cases">Cas d'usage</a></li>
+      <li><a href="#methodo" data-fr="Méthode" data-en="Method">Méthode</a></li>
+      <li><a href="#offres" data-fr="Offres" data-en="Offers">Offres</a></li>
+      <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" id="btnFR">FR</button>
+        <button class="lang-btn" id="btnEN">EN</button>
+      </div>
+      <a href="#contact" class="nav-cta" data-fr="Diagnostic gratuit →" data-en="Free Diagnosis →">Diagnostic gratuit →</a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="accueil">
+  <canvas id="ptc"></canvas>
+  <div class="hero-grid"></div>
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><span class="badge-dot"></span><span data-fr="🇱🇺 Luxembourg · BPM · IA" data-en="🇱🇺 Luxembourg · BPM · AI">🇱🇺 Luxembourg · BPM · IA</span></div>
+      <h1><span data-fr="Automatisez vos" data-en="Automate your">Automatisez vos</span><br><span class="typed-text" id="typedTxt"></span><span class="typed-cursor">|</span></h1>
+      <p class="hero-sub" data-fr="Réduisez les tâches répétitives, améliorez la productivité et structurez votre transformation digitale." data-en="Reduce repetitive tasks, improve productivity and structure your digital transformation.">Réduisez les tâches répétitives, améliorez la productivité et structurez votre transformation digitale.</p>
+      <div class="hero-intro" data-fr="Chez SCG Tech AI, nous aidons les PME et organisations luxembourgeoises à moderniser leurs processus métier grâce à une approche combinant analyse métier, optimisation BPM et intelligence artificielle. Notre objectif : des gains mesurables, réalistes et durables." data-en="At SCG Tech AI, we help Luxembourg SMEs and organisations modernise their business processes through an approach combining business analysis, BPM optimisation and artificial intelligence. Our goal: measurable, realistic and lasting gains.">Chez SCG Tech AI, nous aidons les PME et organisations luxembourgeoises à moderniser leurs processus métier grâce à une approche combinant analyse métier, optimisation BPM et intelligence artificielle. Notre objectif : des gains mesurables, réalistes et durables.</div>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-p" data-fr="📅 Diagnostic gratuit de 30 min" data-en="📅 Free 30-min Diagnosis">📅 Diagnostic gratuit de 30 min</a>
+        <a href="#usecases" class="btn-o" data-fr="Voir les cas d'usage" data-en="See use cases">Voir les cas d'usage</a>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="hc"><div class="hc-ico">⚙️</div><div><div class="hc-t" data-fr="Réduire la charge administrative" data-en="Reduce administrative burden">Réduire la charge administrative</div><div class="hc-d" data-fr="Moins de saisie manuelle, moins d'erreurs, plus de temps utile." data-en="Less manual entry, fewer errors, more useful time.">Moins de saisie manuelle, moins d'erreurs, plus de temps utile.</div></div></div>
+      <div class="hc"><div class="hc-ico">📧</div><div><div class="hc-t" data-fr="Automatiser emails & documents" data-en="Automate emails & documents">Automatiser emails & documents</div><div class="hc-d" data-fr="Traitement intelligent des flux documentaires entrants." data-en="Intelligent processing of incoming document flows.">Traitement intelligent des flux documentaires entrants.</div></div></div>
+      <div class="hc"><div class="hc-ico">🔄</div><div><div class="hc-t" data-fr="Structurer les workflows internes" data-en="Structure internal workflows">Structurer les workflows internes</div><div class="hc-d" data-fr="Processus clairs, bien définis, avant toute automatisation." data-en="Clear, well-defined processes before any automation.">Processus clairs, bien définis, avant toute automatisation.</div></div></div>
+      <div class="hc"><div class="hc-ico">🤝</div><div><div class="hc-t" data-fr="Optimiser la relation client" data-en="Optimise customer relations">Optimiser la relation client</div><div class="hc-d" data-fr="Réponses plus rapides, suivi automatisé, satisfaction renforcée." data-en="Faster responses, automated follow-up, improved satisfaction.">Réponses plus rapides, suivi automatisé, satisfaction renforcée.</div></div></div>
+      <div class="hc"><div class="hc-ico">📊</div><div><div class="hc-t" data-fr="Accélérer la prise de décision" data-en="Accelerate decision-making">Accélérer la prise de décision</div><div class="hc-d" data-fr="Tableaux de bord IA, synthèses automatiques, alertes intelligentes." data-en="AI dashboards, automatic summaries, smart alerts.">Tableaux de bord IA, synthèses automatiques, alertes intelligentes.</div></div></div>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="document.getElementById('counters').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-mouse"><div class="scroll-dot"></div></div>
+    <span data-fr="Découvrir" data-en="Discover">Découvrir</span>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<div class="counters" id="counters">
+  <div class="counters-in">
+    <div class="cnt"><div class="cnt-val"><span class="cv" data-t="30">0</span><span class="cnt-suf">%</span></div><div class="cnt-lbl" data-fr="réduction tâches admin (cas type)" data-en="admin task reduction (typical case)">réduction tâches admin (cas type)</div></div>
+    <div class="cnt"><div class="cnt-val"><span class="cv" data-t="8">0</span><span class="cnt-suf">h</span></div><div class="cnt-lbl" data-fr="économisées/semaine (reporting)" data-en="saved/week (reporting)">économisées/semaine (reporting)</div></div>
+    <div class="cnt"><div class="cnt-val"><span class="cv" data-t="4">0</span></div><div class="cnt-lbl" data-fr="départements couverts" data-en="departments covered">départements couverts</div></div>
+    <div class="cnt"><div class="cnt-val"><span class="cv" data-t="30">0</span><span class="cnt-suf">min</span></div><div class="cnt-lbl" data-fr="pour démarrer le diagnostic" data-en="to start the diagnosis">pour démarrer le diagnostic</div></div>
+  </div>
+</div>
+
+<!-- PROBLÈMES -->
+<section class="problems" id="problemes">
+  <div class="si">
+    <span class="stag rv" data-fr="Enjeux PME" data-en="SME Challenges">Enjeux PME</span>
+    <h2 class="stit rv" data-fr="Vos processus actuels vous freinent" data-en="Your current processes are holding you back">Vos processus actuels vous freinent</h2>
+    <p class="sdesc rv" data-fr="Avant d'intégrer l'IA, nous cartographions et optimisons vos processus. C'est ce qui nous distingue." data-en="Before integrating AI, we map and optimise your processes. That's what sets us apart.">Avant d'intégrer l'IA, nous cartographions et optimisons vos processus. C'est ce qui nous distingue.</p>
+    <div class="pg">
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">📁</span><h3 data-fr="Tâches répétitives à faible valeur" data-en="Low-value repetitive tasks">Tâches répétitives à faible valeur</h3><p data-fr="Saisie manuelle, copier-coller, retraitement de données… votre équipe mérite mieux." data-en="Manual entry, copy-paste, data reprocessing… your team deserves better.">Saisie manuelle, copier-coller, retraitement de données… votre équipe mérite mieux.</p><div class="pc-sol" data-fr="→ Automatisable avec l'IA" data-en="→ Automatable with AI">→ Automatisable avec l'IA</div></div>
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">📧</span><h3 data-fr="Surcharge email et documentaire" data-en="Email and document overload">Surcharge email et documentaire</h3><p data-fr="Des dizaines de documents reçus chaque jour sans traitement structuré ni prioritisation." data-en="Dozens of documents received daily with no structured processing or prioritisation.">Des dizaines de documents reçus chaque jour sans traitement structuré ni prioritisation.</p><div class="pc-sol" data-fr="→ Classification et extraction automatiques" data-en="→ Automatic classification and extraction">→ Classification et extraction automatiques</div></div>
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">📊</span><h3 data-fr="Reporting chronophage" data-en="Time-consuming reporting">Reporting chronophage</h3><p data-fr="Chaque semaine, des heures passées à consolider des données déjà disponibles." data-en="Every week, hours spent consolidating already available data.">Chaque semaine, des heures passées à consolider des données déjà disponibles.</p><div class="pc-sol" data-fr="→ Dashboards générés automatiquement" data-en="→ Automatically generated dashboards">→ Dashboards générés automatiquement</div></div>
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">🔁</span><h3 data-fr="Processus non documentés" data-en="Undocumented processes">Processus non documentés</h3><p data-fr="Chaque collaborateur a sa propre méthode. La qualité dépend des individus, pas du système." data-en="Every employee has their own method. Quality depends on individuals, not the system.">Chaque collaborateur a sa propre méthode. La qualité dépend des individus, pas du système.</p><div class="pc-sol" data-fr="→ Modélisation BPM + standardisation" data-en="→ BPM modelling + standardisation">→ Modélisation BPM + standardisation</div></div>
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">⏱️</span><h3 data-fr="Délais de traitement trop longs" data-en="Processing delays too long">Délais de traitement trop longs</h3><p data-fr="Devis, contrats, factures, relances… chaque étape manuelle allonge les délais." data-en="Quotes, contracts, invoices, follow-ups… each manual step adds delays.">Devis, contrats, factures, relances… chaque étape manuelle allonge les délais.</p><div class="pc-sol" data-fr="→ Workflows automatisés bout-en-bout" data-en="→ End-to-end automated workflows">→ Workflows automatisés bout-en-bout</div></div>
+      <div class="pc rv"><div class="pc-line"></div><span class="pc-ico">🔍</span><h3 data-fr="Décisions sans visibilité" data-en="Decisions without visibility">Décisions sans visibilité</h3><p data-fr="L'information existe mais elle est dispersée. Les arbitrages se font sans données fiables." data-en="The information exists but is scattered. Decisions are made without reliable data.">L'information existe mais elle est dispersée. Les arbitrages se font sans données fiables.</p><div class="pc-sol" data-fr="→ Synthèses IA et alertes intelligentes" data-en="→ AI summaries and smart alerts">→ Synthèses IA et alertes intelligentes</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="usecases" id="usecases">
+  <div class="si">
+    <span class="stag rv" data-fr="Cas d'usage concrets" data-en="Concrete use cases">Cas d'usage concrets</span>
+    <h2 class="stit rv" data-fr="Exemples pour votre entreprise" data-en="Examples for your business">Exemples pour votre entreprise</h2>
+    <p class="sdesc rv" data-fr="Cliquez sur un département pour explorer les applications IA concrètes." data-en="Click on a department to explore concrete AI applications.">Cliquez sur un département pour explorer les applications IA concrètes.</p>
+    <div class="tabs rv">
+      <button class="tab active" data-tab="finance" data-fr="💼 Finance & Admin" data-en="💼 Finance & Admin">💼 Finance & Admin</button>
+      <button class="tab" data-tab="rh" data-fr="👥 Ressources Humaines" data-en="👥 Human Resources">👥 Ressources Humaines</button>
+      <button class="tab" data-tab="com" data-fr="📣 Communication" data-en="📣 Communication">📣 Communication</button>
+      <button class="tab" data-tab="dir" data-fr="📋 Direction & PMO" data-en="📋 Management & PMO">📋 Direction & PMO</button>
+    </div>
+    <div class="tab-panel active" id="tp-finance">
+      <div class="uci"><div class="uci-ico">🧾</div><div class="uci-txt" data-fr="Automatisation du traitement des factures (OCR + extraction + intégration comptable)" data-en="Invoice processing automation (OCR + extraction + accounting integration)">Automatisation du traitement des factures (OCR + extraction + intégration comptable)</div></div>
+      <div class="uci"><div class="uci-ico">📋</div><div class="uci-txt" data-fr="Pré-analyse documentaire et vérification automatique de conformité" data-en="Document pre-analysis and automatic compliance verification">Pré-analyse documentaire et vérification automatique de conformité</div></div>
+      <div class="uci"><div class="uci-ico">📊</div><div class="uci-txt" data-fr="Reporting automatique hebdomadaire, mensuel et à la demande" data-en="Automatic weekly, monthly and on-demand reporting">Reporting automatique hebdomadaire, mensuel et à la demande</div></div>
+      <div class="uci"><div class="uci-ico">🔔</div><div class="uci-txt" data-fr="Relances de paiement personnalisées et priorisées intelligemment" data-en="Intelligently personalised and prioritised payment reminders">Relances de paiement personnalisées et priorisées intelligemment</div></div>
+      <div class="uci"><div class="uci-ico">🗄️</div><div class="uci-txt" data-fr="Archivage intelligent et recherche sémantique dans vos documents" data-en="Smart archiving and semantic search across your documents">Archivage intelligent et recherche sémantique dans vos documents</div></div>
+      <div class="uci"><div class="uci-ico">✅</div><div class="uci-txt" data-fr="Contrôle automatisé des entrées/sorties et alertes d'anomalies" data-en="Automated entry/exit control and anomaly alerts">Contrôle automatisé des entrées/sorties et alertes d'anomalies</div></div>
+    </div>
+    <div class="tab-panel" id="tp-rh">
+      <div class="uci"><div class="uci-ico">📄</div><div class="uci-txt" data-fr="Tri et analyse automatisée des CV selon des critères métier définis" data-en="Automated CV sorting and analysis based on defined business criteria">Tri et analyse automatisée des CV selon des critères métier définis</div></div>
+      <div class="uci"><div class="uci-ico">📧</div><div class="uci-txt" data-fr="Réponses automatiques aux candidats (accusé, suite favorable, refus personnalisé)" data-en="Automatic candidate responses (acknowledgement, positive follow-up, personalised rejection)">Réponses automatiques aux candidats (accusé, suite favorable, refus personnalisé)</div></div>
+      <div class="uci"><div class="uci-ico">🗂️</div><div class="uci-txt" data-fr="Gestion documentaire RH centralisée, indexée et sécurisée" data-en="Centralised, indexed and secure HR document management">Gestion documentaire RH centralisée, indexée et sécurisée</div></div>
+      <div class="uci"><div class="uci-ico">🚀</div><div class="uci-txt" data-fr="Suivi des onboardings et checklists collaborateurs automatisées" data-en="Onboarding tracking and automated employee checklists">Suivi des onboardings et checklists collaborateurs automatisées</div></div>
+      <div class="uci"><div class="uci-ico">📝</div><div class="uci-txt" data-fr="Synthèse automatique des entretiens et évaluations annuelles" data-en="Automatic summary of interviews and annual appraisals">Synthèse automatique des entretiens et évaluations annuelles</div></div>
+      <div class="uci"><div class="uci-ico">📅</div><div class="uci-txt" data-fr="Gestion des absences, congés et alertes RH automatiques" data-en="Absence and leave management with automatic HR alerts">Gestion des absences, congés et alertes RH automatiques</div></div>
+    </div>
+    <div class="tab-panel" id="tp-com">
+      <div class="uci"><div class="uci-ico">✍️</div><div class="uci-txt" data-fr="Génération de contenu structuré : posts, newsletters, fiches produit" data-en="Structured content generation: posts, newsletters, product sheets">Génération de contenu structuré : posts, newsletters, fiches produit</div></div>
+      <div class="uci"><div class="uci-ico">📬</div><div class="uci-txt" data-fr="Automatisation de campagnes email personnalisées selon le profil client" data-en="Automation of personalised email campaigns based on customer profile">Automatisation de campagnes email personnalisées selon le profil client</div></div>
+      <div class="uci"><div class="uci-ico">💬</div><div class="uci-txt" data-fr="Chatbot support client multilingue (FR / EN / LU) disponible 24h/7j" data-en="Multilingual customer support chatbot (FR / EN / LU) available 24/7">Chatbot support client multilingue (FR / EN / LU) disponible 24h/7j</div></div>
+      <div class="uci"><div class="uci-ico">📡</div><div class="uci-txt" data-fr="Analyse de sentiment et monitoring des retours clients en temps réel" data-en="Sentiment analysis and real-time customer feedback monitoring">Analyse de sentiment et monitoring des retours clients en temps réel</div></div>
+      <div class="uci"><div class="uci-ico">🗣️</div><div class="uci-txt" data-fr="Résumé automatique des interactions commerciales et calls clients" data-en="Automatic summary of commercial interactions and client calls">Résumé automatique des interactions commerciales et calls clients</div></div>
+      <div class="uci"><div class="uci-ico">🌐</div><div class="uci-txt" data-fr="Traduction et adaptation multilingue de vos contenus marketing" data-en="Multilingual translation and adaptation of your marketing content">Traduction et adaptation multilingue de vos contenus marketing</div></div>
+    </div>
+    <div class="tab-panel" id="tp-dir">
+      <div class="uci"><div class="uci-ico">📈</div><div class="uci-txt" data-fr="Tableaux de bord exécutifs générés automatiquement, multi-sources" data-en="Automatically generated executive dashboards, multi-source">Tableaux de bord exécutifs générés automatiquement, multi-sources</div></div>
+      <div class="uci"><div class="uci-ico">🎙️</div><div class="uci-txt" data-fr="Synthèse automatique des comptes-rendus de réunions et décisions" data-en="Automatic summary of meeting minutes and decisions">Synthèse automatique des comptes-rendus de réunions et décisions</div></div>
+      <div class="uci"><div class="uci-ico">🗺️</div><div class="uci-txt" data-fr="Suivi de projets avec alertes sur les écarts de délai et de budget" data-en="Project tracking with alerts on schedule and budget variances">Suivi de projets avec alertes sur les écarts de délai et de budget</div></div>
+      <div class="uci"><div class="uci-ico">📋</div><div class="uci-txt" data-fr="Rapports de performance consolidés multi-départements automatiques" data-en="Automatic consolidated multi-department performance reports">Rapports de performance consolidés multi-départements automatiques</div></div>
+      <div class="uci"><div class="uci-ico">🧠</div><div class="uci-txt" data-fr="Aide à la décision basée sur vos données internes et KPIs stratégiques" data-en="Decision support based on your internal data and strategic KPIs">Aide à la décision basée sur vos données internes et KPIs stratégiques</div></div>
+      <div class="uci"><div class="uci-ico">🔮</div><div class="uci-txt" data-fr="Analyses prédictives et scénarios de planification assistée par IA" data-en="Predictive analytics and AI-assisted planning scenarios">Analyses prédictives et scénarios de planification assistée par IA</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="methodology" id="methodo">
+  <div class="mgl"></div>
+  <div class="si" style="position:relative;z-index:1">
+    <span class="stag rv" data-fr="Notre méthode" data-en="Our method">Notre méthode</span>
+    <h2 class="stit rv" data-fr="Nous transformons vos processus avant d'y intégrer l'IA" data-en="We transform your processes before integrating AI">Nous transformons vos processus avant d'y intégrer l'IA</h2>
+    <p class="sdesc rv" data-fr="La plupart des agences vendent des outils. Nous cartographions, optimisons puis automatisons — c'est la différence entre une solution qui fonctionne et une qui dure." data-en="Most agencies sell tools. We map, optimise then automate — that's the difference between a solution that works and one that lasts.">La plupart des agences vendent des outils. Nous cartographions, optimisons puis automatisons — c'est la différence entre une solution qui fonctionne et une qui dure.</p>
+    <div class="steps rv">
+      <div class="steps-line"></div>
+      <div class="stp"><div class="stp-n">1</div><h3 data-fr="Diagnostic" data-en="Diagnosis">Diagnostic</h3><p data-fr="Identification des processus clés, des tâches répétitives et des opportunités d'automatisation réelles." data-en="Identification of key processes, repetitive tasks and real automation opportunities.">Identification des processus clés, des tâches répétitives et des opportunités d'automatisation réelles.</p></div>
+      <div class="stp"><div class="stp-n">2</div><h3 data-fr="Modélisation BPM" data-en="BPM Modelling">Modélisation BPM</h3><p data-fr="Cartographie et optimisation des processus avant toute automatisation." data-en="Process mapping and optimisation before any automation.">Cartographie et optimisation des processus avant toute automatisation.</p></div>
+      <div class="stp"><div class="stp-n">3</div><h3 data-fr="Implémentation" data-en="Implementation">Implémentation</h3><p data-fr="Déploiement progressif, intégration à vos outils existants, formation des équipes." data-en="Progressive deployment, integration with your existing tools, team training.">Déploiement progressif, intégration à vos outils existants, formation des équipes.</p></div>
+      <div class="stp"><div class="stp-n">4</div><h3 data-fr="Mesure & ROI" data-en="Measure & ROI">Mesure & ROI</h3><p data-fr="Suivi des gains concrets : temps économisé, erreurs réduites, coûts optimisés, ROI documenté." data-en="Tracking concrete gains: time saved, errors reduced, costs optimised, documented ROI.">Suivi des gains concrets : temps économisé, erreurs réduites, coûts optimisés, ROI documenté.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFRES -->
+<section class="offers" id="offres">
+  <div class="si">
+    <span class="stag rv" data-fr="Nos offres" data-en="Our offers">Nos offres</span>
+    <h2 class="stit rv" data-fr="Une approche progressive et sur mesure" data-en="A progressive and tailored approach">Une approche progressive et sur mesure</h2>
+    <p class="sdesc rv" data-fr="Nous parlons d'abord de votre besoin réel avant toute proposition commerciale." data-en="We first discuss your real need before any commercial proposal.">Nous parlons d'abord de votre besoin réel avant toute proposition commerciale.</p>
+    <div class="og">
+      <div class="ofc rv-l"><div class="ofc-top-bar"></div>
+        <div class="ofc-num">Offre 01</div>
+        <h3 data-fr="Diagnostic IA" data-en="AI Diagnosis">Diagnostic IA</h3>
+        <p class="ofc-desc" data-fr="Analyse de vos processus, identification des opportunités et roadmap priorisée." data-en="Analysis of your processes, opportunity identification and prioritised roadmap.">Analyse de vos processus, identification des opportunités et roadmap priorisée.</p>
+        <ul class="ofc-feats">
+          <li><span class="fchk">✓</span><span data-fr="Session de cadrage (30 min, gratuite)" data-en="Scoping session (30 min, free)">Session de cadrage (30 min, gratuite)</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Audit de vos processus existants" data-en="Audit of your existing processes">Audit de vos processus existants</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Identification des cas d'usage prioritaires" data-en="Identification of priority use cases">Identification des cas d'usage prioritaires</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Roadmap d'automatisation priorisée" data-en="Prioritised automation roadmap">Roadmap d'automatisation priorisée</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Livrable écrit inclus" data-en="Written deliverable included">Livrable écrit inclus</span></li>
+        </ul>
+        <a href="#contact" class="obtn obtn-o" data-fr="Démarrer le diagnostic" data-en="Start the diagnosis">Démarrer le diagnostic</a>
+        <p class="onote" data-fr="Première session offerte · Sans engagement" data-en="First session free · No commitment">Première session offerte · Sans engagement</p>
+      </div>
+      <div class="ofc feat rv"><div class="ofc-top-bar"></div>
+        <div class="feat-badge" data-fr="Recommandé" data-en="Recommended">Recommandé</div>
+        <div class="ofc-num">Offre 02</div>
+        <h3 data-fr="Transformation ciblée" data-en="Targeted Transformation">Transformation ciblée</h3>
+        <p class="ofc-desc" data-fr="Automatisation de 1 à 3 processus prioritaires identifiés lors du diagnostic." data-en="Automation of 1 to 3 priority processes identified during the diagnosis.">Automatisation de 1 à 3 processus prioritaires identifiés lors du diagnostic.</p>
+        <ul class="ofc-feats">
+          <li><span class="fchk">✓</span><span data-fr="Modélisation BPM du processus cible" data-en="BPM modelling of the target process">Modélisation BPM du processus cible</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Développement et déploiement IA" data-en="AI development and deployment">Développement et déploiement IA</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Intégration à vos outils existants" data-en="Integration with your existing tools">Intégration à vos outils existants</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Formation de vos équipes" data-en="Team training">Formation de vos équipes</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Suivi des résultats sur 30 jours" data-en="30-day results monitoring">Suivi des résultats sur 30 jours</span></li>
+        </ul>
+        <a href="#contact" class="obtn obtn-f" data-fr="Nous contacter" data-en="Contact us">Nous contacter</a>
+        <p class="onote" data-fr="Tarif selon périmètre · Devis sur demande" data-en="Price based on scope · Quote on request">Tarif selon périmètre · Devis sur demande</p>
+      </div>
+      <div class="ofc rv-r"><div class="ofc-top-bar"></div>
+        <div class="ofc-num">Offre 03</div>
+        <h3 data-fr="Intégration stratégique" data-en="Strategic Integration">Intégration stratégique</h3>
+        <p class="ofc-desc" data-fr="Déploiement IA multi-départements avec accompagnement sur la durée." data-en="Multi-department AI deployment with long-term support.">Déploiement IA multi-départements avec accompagnement sur la durée.</p>
+        <ul class="ofc-feats">
+          <li><span class="fchk">✓</span><span data-fr="Audit complet multi-départements" data-en="Full multi-department audit">Audit complet multi-départements</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Stratégie de transformation digitale" data-en="Digital transformation strategy">Stratégie de transformation digitale</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Déploiement de plusieurs solutions IA" data-en="Deployment of multiple AI solutions">Déploiement de plusieurs solutions IA</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Change management inclus" data-en="Change management included">Change management inclus</span></li>
+          <li><span class="fchk">✓</span><span data-fr="Support et évolutions continus" data-en="Ongoing support and improvements">Support et évolutions continus</span></li>
+        </ul>
+        <a href="#contact" class="obtn obtn-o" data-fr="Prendre rendez-vous" data-en="Book a meeting">Prendre rendez-vous</a>
+        <p class="onote" data-fr="Sur devis · Engagement moyen / long terme" data-en="On quote · Medium / long-term commitment">Sur devis · Engagement moyen / long terme</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="why">
+  <div class="si">
+    <span class="stag rv" data-fr="Pourquoi SCG Tech AI" data-en="Why SCG Tech AI">Pourquoi SCG Tech AI</span>
+    <h2 class="stit rv" data-fr="Un cabinet, pas une agence généraliste" data-en="A firm, not a generalist agency">Un cabinet, pas une agence généraliste</h2>
+    <p class="sdesc rv" data-fr="Notre positionnement unique : expertise processus métier + IA, au cœur du marché luxembourgeois." data-en="Our unique positioning: business process expertise + AI, at the heart of the Luxembourg market.">Notre positionnement unique : expertise processus métier + IA, au cœur du marché luxembourgeois.</p>
+    <div class="wg">
+      <div class="wc rv"><span class="wc-ico">🗺️</span><h3 data-fr="Expertise BPM & processus" data-en="BPM & process expertise">Expertise BPM & processus</h3><p data-fr="Nous cartographions et optimisons vos processus avant d'y intégrer l'IA. Modélisation ARIS, analyse métier, vision systémique." data-en="We map and optimise your processes before integrating AI. ARIS modelling, business analysis, systemic vision.">Nous cartographions et optimisons vos processus avant d'y intégrer l'IA. Modélisation ARIS, analyse métier, vision systémique.</p></div>
+      <div class="wc rv"><span class="wc-ico">🎯</span><h3 data-fr="Approche pragmatique" data-en="Pragmatic approach">Approche pragmatique</h3><p data-fr="Pas de buzzwords. Des solutions concrètes, testées, mesurables. Nous partons de vos vrais problèmes, pas d'une technologie à vendre." data-en="No buzzwords. Concrete, tested, measurable solutions. We start from your real problems, not a technology to sell.">Pas de buzzwords. Des solutions concrètes, testées, mesurables. Nous partons de vos vrais problèmes, pas d'une technologie à vendre.</p></div>
+      <div class="wc rv"><span class="wc-ico">🇱🇺</span><h3 data-fr="Focus Luxembourg" data-en="Luxembourg focus">Focus Luxembourg</h3><p data-fr="Connaissance du tissu économique local, des contraintes réglementaires et des spécificités du marché luxembourgeois." data-en="Knowledge of the local economic fabric, regulatory constraints and specificities of the Luxembourg market.">Connaissance du tissu économique local, des contraintes réglementaires et des spécificités du marché luxembourgeois.</p></div>
+      <div class="wc rv"><span class="wc-ico">🔒</span><h3 data-fr="Confidentialité & conformité" data-en="Confidentiality & compliance">Confidentialité & conformité</h3><p data-fr="Traitement en conformité RGPD. Vos processus métier restent confidentiels. Sécurité et souveraineté des données." data-en="GDPR-compliant processing. Your business processes remain confidential. Data security and sovereignty.">Traitement en conformité RGPD. Vos processus métier restent confidentiels. Sécurité et souveraineté des données.</p></div>
+      <div class="wc rv"><span class="wc-ico">📐</span><h3 data-fr="Vision BPM + IA intégrée" data-en="Integrated BPM + AI vision">Vision BPM + IA intégrée</h3><p data-fr="L'IA sans processus bien définis, c'est de l'automatisation du chaos. Nous structurons d'abord, nous automatisons ensuite." data-en="AI without well-defined processes is automating chaos. We structure first, then automate.">L'IA sans processus bien définis, c'est de l'automatisation du chaos. Nous structurons d'abord, nous automatisons ensuite.</p></div>
+      <div class="wc rv"><span class="wc-ico">📈</span><h3 data-fr="Gains mesurables & durables" data-en="Measurable & lasting gains">Gains mesurables & durables</h3><p data-fr="Nous documentons les résultats : temps économisé, erreurs réduites, ROI chiffré. Pas de promesses vagues." data-en="We document results: time saved, errors reduced, quantified ROI. No vague promises.">Nous documentons les résultats : temps économisé, erreurs réduites, ROI chiffré. Pas de promesses vagues.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section class="cases">
+  <div class="si">
+    <span class="stag rv" data-fr="Retours d'expérience" data-en="Client results">Retours d'expérience</span>
+    <h2 class="stit rv" data-fr="Résultats constatés chez nos clients" data-en="Results achieved with our clients">Résultats constatés chez nos clients</h2>
+    <p class="sdesc rv" data-fr="Sans citer nos clients par respect de leur confidentialité, voici des résultats types obtenus." data-en="Without naming our clients out of respect for confidentiality, here are typical results achieved.">Sans citer nos clients par respect de leur confidentialité, voici des résultats types obtenus.</p>
+    <div class="cg">
+      <div class="cc rv"><div class="cc-line"></div><div class="cc-sec" data-fr="PME de services — Luxembourg" data-en="Services SME — Luxembourg">PME de services — Luxembourg</div><h3 data-fr="Automatisation documentaire" data-en="Document automation">Automatisation documentaire</h3><p data-fr="Traitement automatisé des factures fournisseurs : OCR, extraction et intégration comptable. Processus entièrement refondu avant déploiement." data-en="Automated supplier invoice processing: OCR, extraction and accounting integration. Process fully redesigned before deployment.">Traitement automatisé des factures fournisseurs : OCR, extraction et intégration comptable. Processus entièrement refondu avant déploiement.</p><div class="cc-res" data-fr="📉 −30 % de temps de traitement administratif" data-en="📉 −30% administrative processing time">📉 −30 % de temps de traitement administratif</div></div>
+      <div class="cc rv"><div class="cc-line"></div><div class="cc-sec" data-fr="Cabinet RH — Luxembourg" data-en="HR Firm — Luxembourg">Cabinet RH — Luxembourg</div><h3 data-fr="Tri automatisé des candidatures" data-en="Automated application sorting">Tri automatisé des candidatures</h3><p data-fr="Mise en place d'un système de scoring et de tri intelligent des CV, avec réponses automatiques personnalisées aux candidats." data-en="Implementation of an intelligent CV scoring and sorting system, with personalised automatic responses to candidates.">Mise en place d'un système de scoring et de tri intelligent des CV, avec réponses automatiques personnalisées aux candidats.</p><div class="cc-res" data-fr="📈 2× plus de dossiers traités par semaine" data-en="📈 2× more files processed per week">📈 2× plus de dossiers traités par semaine</div></div>
+      <div class="cc rv"><div class="cc-line"></div><div class="cc-sec" data-fr="Organisation multi-sites — Luxembourg" data-en="Multi-site organisation — Luxembourg">Organisation multi-sites — Luxembourg</div><h3 data-fr="Reporting automatisé multi-départements" data-en="Automated multi-department reporting">Reporting automatisé multi-départements</h3><p data-fr="Consolidation automatique des KPIs de plusieurs départements avec génération de rapports et alertes intelligentes." data-en="Automatic consolidation of KPIs from multiple departments with report generation and smart alerts.">Consolidation automatique des KPIs de plusieurs départements avec génération de rapports et alertes intelligentes.</p><div class="cc-res" data-fr="⏱️ −8h de reporting manuel par semaine" data-en="⏱️ −8h of manual reporting per week">⏱️ −8h de reporting manuel par semaine</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-f" id="contact">
+  <div class="cta-bg-glow"></div>
+  <div class="si">
+    <span class="stag rv" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)" data-fr="Première étape" data-en="First step">Première étape</span>
+    <h2 class="rv" data-fr="Parlons de votre besoin avant toute proposition" data-en="Let's discuss your need before any proposal">Parlons de votre besoin avant toute proposition</h2>
+    <p class="rv" data-fr="Un diagnostic gratuit de 30 minutes pour identifier où l'IA peut réellement transformer votre activité. Sans engagement, sans jargon." data-en="A free 30-minute diagnosis to identify where AI can truly transform your business. No commitment, no jargon.">Un diagnostic gratuit de 30 minutes pour identifier où l'IA peut réellement transformer votre activité. Sans engagement, sans jargon.</p>
+
+    <div class="diag-form rv" id="diagForm">
+      <div class="form-grid">
+        <div class="fg-row">
+          <div class="fi-wrap">
+            <label data-fr="Prénom & Nom" data-en="Full Name">Prénom & Nom</label>
+            <input type="text" id="fName" data-fr-placeholder="Marie Dupont" data-en-placeholder="John Smith" placeholder="Marie Dupont">
+          </div>
+          <div class="fi-wrap">
+            <label data-fr="Entreprise" data-en="Company">Entreprise</label>
+            <input type="text" id="fCo" data-fr-placeholder="Votre société" data-en-placeholder="Your company" placeholder="Votre société">
+          </div>
+        </div>
+        <div class="fg-row">
+          <div class="fi-wrap">
+            <label data-fr="Email professionnel" data-en="Professional email">Email professionnel</label>
+            <input type="email" id="fEmail" placeholder="marie@societe.lu">
+          </div>
+          <div class="fi-wrap">
+            <label><span data-fr="Téléphone" data-en="Phone">Téléphone</span> <span class="opt" data-fr="(optionnel)" data-en="(optional)">(optionnel)</span></label>
+            <input type="tel" id="fPhone" placeholder="+352 …">
+          </div>
+        </div>
+        <div class="fi-wrap" style="grid-column:1/-1">
+          <label data-fr="Département prioritaire" data-en="Priority department">Département prioritaire</label>
+          <div class="dept-chips" id="deptChips">
+            <button type="button" class="chip" data-fr="💼 Finance & Admin" data-en="💼 Finance & Admin">💼 Finance & Admin</button>
+            <button type="button" class="chip" data-fr="👥 RH" data-en="👥 HR">👥 RH</button>
+            <button type="button" class="chip" data-fr="📣 Communication" data-en="📣 Communication">📣 Communication</button>
+            <button type="button" class="chip" data-fr="📋 Direction / PMO" data-en="📋 Management / PMO">📋 Direction / PMO</button>
+            <button type="button" class="chip" data-fr="✳️ Autre" data-en="✳️ Other">✳️ Autre</button>
+          </div>
+        </div>
+        <div class="fi-wrap" style="grid-column:1/-1">
+          <label><span data-fr="Décrivez brièvement votre besoin" data-en="Briefly describe your need">Décrivez brièvement votre besoin</span> <span class="opt" data-fr="(optionnel)" data-en="(optional)">(optionnel)</span></label>
+          <textarea id="fMsg" rows="3" data-fr-placeholder="Ex : nous traitons manuellement 200 factures par mois…" data-en-placeholder="E.g.: we manually process 200 invoices per month…" placeholder="Ex : nous traitons manuellement 200 factures par mois…"></textarea>
+        </div>
+        <div class="fi-wrap" style="grid-column:1/-1;align-items:flex-start">
+          <div id="formError" class="form-error" style="display:none"></div>
+          <button type="button" class="btn-p submit-btn" id="submitBtn" style="width:100%;justify-content:center;font-size:1rem;padding:16px">
+            <span id="submitLabel" data-fr="📅 Réserver mon diagnostic gratuit — 30 min" data-en="📅 Book my free diagnosis — 30 min">📅 Réserver mon diagnostic gratuit — 30 min</span>
+          </button>
+          <p class="form-note" data-fr="Sans engagement · Réponse sous 24h · Confidentialité garantie" data-en="No commitment · Reply within 24h · Guaranteed confidentiality">Sans engagement · Réponse sous 24h · Confidentialité garantie</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="diag-success" id="diagSuccess" style="display:none">
+      <div class="success-ico">✅</div>
+      <h3 data-fr="Demande envoyée !" data-en="Request sent!">Demande envoyée !</h3>
+      <p><span data-fr="Merci" data-en="Thank you">Merci</span> <span id="successName"></span>. <span data-fr="Nous vous contacterons sous 24h pour confirmer votre créneau de diagnostic." data-en="We will contact you within 24h to confirm your diagnosis slot.">Nous vous contacterons sous 24h pour confirmer votre créneau de diagnostic.</span></p>
+      <p style="font-size:.85rem"><span data-fr="En attendant, écrivez-nous à" data-en="In the meantime, write to us at">En attendant, écrivez-nous à</span> <a href="mailto:info@scgtech-ai.lu">info@scgtech-ai.lu</a></p>
+    </div>
+
+    <div class="cta-contacts rv">
+      <div class="ctact"><span data-fr="Adresse" data-en="Address">Adresse</span><a>19 Rue de l'Industrie, 8069 Bertrange</a></div>
+      <div class="ctact"><span>Email</span><a href="mailto:info@scgtech-ai.lu">info@scgtech-ai.lu</a></div>
+      <div class="ctact"><span>LinkedIn</span><a href="https://linkedin.com" target="_blank">SCG Tech AI</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fi">
+    <div class="fg">
+      <div class="fb">
+        <span class="flm">SCG Tech AI</span>
+        <span class="fls" data-fr="Cabinet BPM & Intelligence Artificielle" data-en="BPM & Artificial Intelligence Firm">Cabinet BPM & Intelligence Artificielle</span>
+        <p data-fr="Automatiser intelligemment. Transformer durablement. Luxembourg · BPM + IA" data-en="Automate intelligently. Transform durably. Luxembourg · BPM + AI">Automatiser intelligemment. Transformer durablement. Luxembourg · BPM + IA</p>
+        <div class="fsoc"><a href="https://linkedin.com" target="_blank" class="soc">in</a><a href="mailto:info@scgtech-ai.lu" class="soc">✉</a></div>
+      </div>
+      <div class="fc"><h4 data-fr="Services" data-en="Services">Services</h4><ul>
+        <li><a href="#offres" data-fr="Diagnostic IA" data-en="AI Diagnosis">Diagnostic IA</a></li>
+        <li><a href="#offres" data-fr="Transformation ciblée" data-en="Targeted Transformation">Transformation ciblée</a></li>
+        <li><a href="#offres" data-fr="Intégration stratégique" data-en="Strategic Integration">Intégration stratégique</a></li>
+        <li><a href="#methodo" data-fr="Modélisation BPM" data-en="BPM Modelling">Modélisation BPM</a></li>
+      </ul></div>
+      <div class="fc"><h4 data-fr="Cas d'usage" data-en="Use cases">Cas d'usage</h4><ul>
+        <li><a href="#usecases" data-fr="Finance & Admin" data-en="Finance & Admin">Finance & Admin</a></li>
+        <li><a href="#usecases" data-fr="Ressources Humaines" data-en="Human Resources">Ressources Humaines</a></li>
+        <li><a href="#usecases" data-fr="Communication" data-en="Communication">Communication</a></li>
+        <li><a href="#usecases" data-fr="Direction & PMO" data-en="Management & PMO">Direction & PMO</a></li>
+      </ul></div>
+      <div class="fc"><h4 data-fr="Entreprise" data-en="Company">Entreprise</h4><ul>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#" data-fr="Mentions légales" data-en="Legal notices">Mentions légales</a></li>
+        <li><a href="#" data-fr="Politique de confidentialité" data-en="Privacy policy">Politique de confidentialité</a></li>
+        <li><a href="#">RGPD / GDPR</a></li>
+      </ul></div>
+    </div>
+    <div class="fbot">
+      <p>© 2025 SCG Tech AI · <span data-fr="Cabinet BPM & Intelligence Artificielle" data-en="BPM & Artificial Intelligence Firm">Cabinet BPM & Intelligence Artificielle</span> · Luxembourg</p>
+      <div class="flegal">
+        <a href="#" data-fr="Mentions légales" data-en="Legal notices">Mentions légales</a>
+        <a href="#" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a>
+        <a href="#">RGPD / GDPR</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── LANGUE ──────────────────────────────────────────────
+let lang='fr';
+const phrasesLang={
+  fr:['processus métier','workflows internes','tâches répétitives','relation client','prises de décision'],
+  en:['business processes','internal workflows','repetitive tasks','customer relations','decision-making']
+};
+
+function applyLang(l){
+  lang=l;
+  document.documentElement.lang=l==='fr'?'fr':'en';
+  document.getElementById('btnFR').classList.toggle('active',l==='fr');
+  document.getElementById('btnEN').classList.toggle('active',l==='en');
+
+  // Textes data-fr / data-en
+  document.querySelectorAll('[data-fr]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'){
+      el.placeholder=el.dataset[l+'Placeholder']||el.dataset.frPlaceholder||'';
+    } else {
+      el.textContent=el.dataset[l]||el.dataset.fr;
+    }
+  });
+
+  // Placeholders séparés sur inputs
+  document.querySelectorAll('[data-fr-placeholder]').forEach(el=>{
+    el.placeholder=el.dataset[l==='fr'?'frPlaceholder':'enPlaceholder']||el.dataset.frPlaceholder;
+  });
+
+  // Relancer le typer avec les bonnes phrases
+  typedPhrases=phrasesLang[l];
+  pi=0;ci=0;del=false;
+  if(typedEl) typedEl.textContent='';
+  clearTimeout(typeTimer);
+  typeTimer=setTimeout(type,400);
+
+  // Titre page
+  document.title=l==='fr'
+    ?"SCG Tech AI — L'IA au service de vos processus métier | Luxembourg"
+    :"SCG Tech AI — AI for your business processes | Luxembourg";
+}
+
+document.getElementById('btnFR').addEventListener('click',()=>applyLang('fr'));
+document.getElementById('btnEN').addEventListener('click',()=>applyLang('en'));
+
+// ── LOADER ───────────────────────────────────────────────
+const lbar=document.getElementById('lbar'),loader=document.getElementById('loader');
+let prog=0;
+const lt=setInterval(()=>{
+  prog+=Math.random()*4+2;lbar.style.width=Math.min(prog,95)+'%';
+  if(prog>=95){clearInterval(lt);setTimeout(()=>{lbar.style.width='100%';setTimeout(()=>loader.classList.add('hide'),400)},300)}
+},60);
+
+// ── CURSOR ───────────────────────────────────────────────
+const cur=document.getElementById('cur'),ring=document.getElementById('curRing');
+let mx=window.innerWidth/2,my=window.innerHeight/2,rx=mx,ry=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function animR(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=Math.round(rx)+'px';ring.style.top=Math.round(ry)+'px';requestAnimationFrame(animR)})();
+document.querySelectorAll('a,button,.hc,.pc,.ofc,.wc,.cc,.stp').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.classList.add('hov');ring.classList.add('hov')});
+  el.addEventListener('mouseleave',()=>{cur.classList.remove('hov');ring.classList.remove('hov')});
+});
+
+// ── PARTICLES ────────────────────────────────────────────
+const cv=document.getElementById('ptc'),ctx=cv.getContext('2d');
+let W,H,pts=[];
+const resize=()=>{W=cv.width=window.innerWidth;const hero=document.getElementById('accueil');H=cv.height=hero?hero.offsetHeight:window.innerHeight;};
+resize();window.addEventListener('resize',()=>{resize();initP();},{passive:true});
+const initP=()=>{pts=[];for(let i=0;i<90;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.4+.4,pulse:Math.random()*Math.PI*2})};
+initP();
+(function draw(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.pulse+=.015;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=.4+.3*Math.sin(p.pulse);ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(100,160,255,${a.toFixed(2)})`;ctx.fill();});
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(100,160,255,${(0.12*(1-d/110)).toFixed(3)})`;ctx.lineWidth=.5;ctx.stroke();}}
+  requestAnimationFrame(draw);
+})();
+
+// ── HEADER ───────────────────────────────────────────────
+window.addEventListener('scroll',()=>{document.getElementById('hdr').classList.toggle('scrolled',scrollY>60);},{passive:true});
+
+// ── TYPING ───────────────────────────────────────────────
+let typedPhrases=phrasesLang.fr,pi=0,ci=0,del=false,typeTimer=null;
+const typedEl=document.getElementById('typedTxt');
+function type(){
+  if(!typedEl)return;
+  const w=typedPhrases[pi];
+  if(!del){typedEl.textContent=w.slice(0,ci+1);ci++;if(ci===w.length){del=true;typeTimer=setTimeout(type,2200);return;}}
+  else{typedEl.textContent=w.slice(0,ci-1);ci--;if(ci===0){del=false;pi=(pi+1)%typedPhrases.length;}}
+  typeTimer=setTimeout(type,del?45:90);
+}
+typeTimer=setTimeout(type,1200);
+
+// ── SCROLL REVEAL ────────────────────────────────────────
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('show'),i*60);obs.unobserve(e.target);}});
+},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rv,.rv-l,.rv-r').forEach(el=>obs.observe(el));
+
+// ── SMOOTH SCROLL ────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}});
+});
+
+// ── TABS ─────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tp-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── COUNTERS ─────────────────────────────────────────────
+function animateCounters(container){
+  container.querySelectorAll('.cv').forEach(el=>{
+    const target=+el.dataset.t;if(!target)return;
+    let v=0;const inc=target/(1800/16);
+    const t=setInterval(()=>{v+=inc;if(v>=target){v=target;clearInterval(t);}el.textContent=Math.floor(v);},16);
+  });
+}
+const cEl=document.querySelector('.counters');
+if(cEl){new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){animateCounters(e.target);e.target._obs.unobserve(e.target);}});},{threshold:0.2}).observe(cEl);cEl._obs={unobserve:el=>el};}
+// Fix propre :
+const cObs2=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){animateCounters(e.target);cObs2.unobserve(e.target);}});},{threshold:0.2});
+if(cEl)cObs2.observe(cEl);
+
+// ── PARALLAX ─────────────────────────────────────────────
+const orb1=document.querySelector('.hero-orb1'),orb2=document.querySelector('.hero-orb2');
+window.addEventListener('scroll',()=>{const s=scrollY;if(orb1)orb1.style.transform=`translateY(${s*.15}px)`;if(orb2)orb2.style.transform=`translateY(${-s*.1}px)`;},{passive:true});
+
+// ── CHIPS ────────────────────────────────────────────────
+let selectedDept='';
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');selectedDept=chip.dataset[lang]||chip.dataset.fr;});
+});
+
+// ── FORM SUBMIT ──────────────────────────────────────────
+document.getElementById('submitBtn').addEventListener('click',()=>{
+  const name=document.getElementById('fName').value.trim();
+  const co=document.getElementById('fCo').value.trim();
+  const email=document.getElementById('fEmail').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  const msg=document.getElementById('fMsg').value.trim();
+  const errEl=document.getElementById('formError');
+  errEl.style.display='none';
+
+  const errs={fr:{name:'Veuillez indiquer votre nom.',email:'Veuillez entrer un email valide.',send:'Envoi en cours…',error:'Erreur. Écrivez-nous à info@scgtech-ai.lu'},en:{name:'Please enter your name.',email:'Please enter a valid email.',send:'Sending…',error:'Error. Write to us at info@scgtech-ai.lu'}};
+  const t=errs[lang];
+
+  if(!name){errEl.textContent=t.name;errEl.style.display='block';document.getElementById('fName').focus();return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent=t.email;errEl.style.display='block';document.getElementById('fEmail').focus();return;}
+
+  const btn=document.getElementById('submitBtn');
+  const lbl=document.getElementById('submitLabel');
+  btn.disabled=true;lbl.textContent='⏳ '+t.send;
+
+  fetch('https://formspree.io/f/mnjwqbzd',{
+    method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({nom:name,entreprise:co||'—',email,telephone:phone||'—',departement:selectedDept||'—',besoin:msg||'—',_subject:`Diagnostic IA — ${name}${co?' ('+co+')':''}`})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.ok){showSuccess(name);}
+    else{errEl.textContent=t.error;errEl.style.display='block';btn.disabled=false;lbl.textContent=document.getElementById('submitLabel').dataset[lang]||lbl.dataset.fr;}
+  })
+  .catch(()=>{
+    const subj=encodeURIComponent(`Diagnostic IA — ${name}${co?' ('+co+')':''}`);
+    const body=encodeURIComponent(`Nom: ${name}\nEntreprise: ${co||'—'}\nEmail: ${email}\nTél: ${phone||'—'}\nDépartement: ${selectedDept||'—'}\n\nBesoin:\n${msg||'—'}`);
+    window.open(`mailto:chris45417@hotmail.com?subject=${subj}&body=${body}`);
+    showSuccess(name);
+  });
+
+  function showSuccess(name){
+    document.getElementById('diagForm').style.display='none';
+    document.getElementById('diagSuccess').style.display='block';
+    document.getElementById('successName').textContent=name.split(' ')[0];
+  }
+});
+</script>
+</body>
+</html>
