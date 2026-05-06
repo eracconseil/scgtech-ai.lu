@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentions légales — SCG Tech AI</title>
+  <meta name="description" content="Mentions légales de SCG Tech AI, cabinet BPM & Intelligence Artificielle au Luxembourg." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --surface: #111520;
+      --border: #1e2535;
+      --accent: #3b6fff;
+      --accent-2: #00d4aa;
+      --text: #e8ecf4;
+      --text-muted: #7b8399;
+      --text-light: #a9b3cc;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,13,20,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1rem, 5vw, 3rem);
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+    .back-link {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 5vw, 2rem) 5rem;
+    }
+
+    .page-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(59,111,255,0.1);
+      border: 1px solid rgba(59,111,255,0.25);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+    .update-date {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2.5rem 0;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    p { color: var(--text-light); margin-bottom: 0.75rem; }
+    p:last-child { margin-bottom: 0; }
+
+    .info-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .info-block p { margin-bottom: 0.4rem; }
+    .info-block strong { color: var(--text); font-weight: 500; }
+    .info-block a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .info-block a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem clamp(1rem, 5vw, 3rem);
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .footer-links a {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover, .footer-links a[aria-current] { color: var(--accent); }
+    .copyright { font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">SCG Tech <span>AI</span></a>
+    <a href="index.html" class="back-link">← Retour au site</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-badge">⚖️ Informations légales</div>
+  <h1>Mentions légales</h1>
+  <p class="update-date">Dernière mise à jour : mai 2025</p>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Éditeur du site</h2>
+    <p>Le site <strong>scgtech-ai.lu</strong> est édité par :</p>
+    <div class="info-block">
+      <p><strong>Dénomination sociale :</strong> SCG Tech AI</p>
+      <p><strong>Forme juridique :</strong> Société à responsabilité limitée (Sàrl) — en cours d'immatriculation</p>
+      <p><strong>Siège social :</strong> 19 Rue de l'Industrie, 8069 Bertrange, Luxembourg</p>
+      <p><strong>Email :</strong> <a href="mailto:info@scgtech-ai.lu">info@scgtech-ai.lu</a></p>
+      <p><strong>Numéro TVA :</strong> En cours d'attribution (RCSL Luxembourg)</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Directeur de la publication</h2>
+    <div class="info-block">
+      <p><strong>Responsable :</strong> Gérant de SCG Tech AI</p>
+      <p><strong>Contact :</strong> <a href="mailto:info@scgtech-ai.lu">info@scgtech-ai.lu</a></p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Hébergement</h2>
+    <div class="info-block">
+      <p><strong>Hébergeur :</strong> GitHub Pages</p>
+      <p><strong>Société :</strong> GitHub, Inc. (filiale de Microsoft Corporation)</p>
+      <p><strong>Adresse :</strong> 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis</p>
+      <p><strong>Site :</strong> <a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a></p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Propriété intellectuelle</h2>
+    <p>L'ensemble du contenu de ce site (textes, graphiques, logos, images, structure) est protégé par les lois luxembourgeoises et européennes en vigueur relatives à la propriété intellectuelle.</p>
+    <p>Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation préalable et écrite de SCG Tech AI.</p>
+    <p>Toute exploitation non autorisée est susceptible de donner lieu à des poursuites judiciaires.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Limitation de responsabilité</h2>
+    <p>Les informations contenues sur ce site sont données à titre indicatif et ne sauraient dispenser l'utilisateur d'une analyse complémentaire et personnalisée.</p>
+    <p>SCG Tech AI s'efforce de fournir des informations aussi précises que possible. Toutefois, elle ne pourra être tenue responsable des omissions, inexactitudes ou carences dans la mise à jour.</p>
+    <p>SCG Tech AI se réserve le droit de modifier les contenus de ce site à tout moment et sans préavis.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Liens hypertextes</h2>
+    <p>Le site peut contenir des liens vers des sites tiers. SCG Tech AI n'exerce aucun contrôle sur ces sites externes et décline toute responsabilité quant à leur contenu, politique de confidentialité ou pratiques.</p>
+    <p>La création de liens hypertextes vers le présent site est soumise à l'accord préalable et écrit de SCG Tech AI.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Droit applicable et juridiction compétente</h2>
+    <p>Les présentes mentions légales sont soumises au droit luxembourgeois.</p>
+    <p>En cas de litige et à défaut de résolution amiable, les tribunaux luxembourgeois seront seuls compétents.</p>
+    <div class="info-block">
+      <p><strong>Juridiction compétente :</strong> Tribunal d'Arrondissement de Luxembourg</p>
+      <p><strong>Droit applicable :</strong> Loi luxembourgeoise et réglementation européenne en vigueur</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Données personnelles</h2>
+    <p>Le traitement des données personnelles collectées via ce site est décrit dans notre <a href="politique-confidentialite.html" style="color:var(--accent)">Politique de confidentialité</a>.</p>
+    <p>Conformément au Règlement Général sur la Protection des Données (RGPD – Règlement UE 2016/679), vous disposez de droits sur vos données. Pour toute question ou demande, contactez-nous à : <a href="mailto:info@scgtech-ai.lu" style="color:var(--accent)">info@scgtech-ai.lu</a></p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Contact</h2>
+    <div class="info-block">
+      <p>Pour toute question relative aux mentions légales :</p>
+      <p><strong>Email :</strong> <a href="mailto:info@scgtech-ai.lu">info@scgtech-ai.lu</a></p>
+      <p><strong>Adresse :</strong> 19 Rue de l'Industrie, 8069 Bertrange, Luxembourg</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="mentions-legales.html" aria-current="page">Mentions légales</a>
+      <a href="politique-confidentialite.html">Politique de confidentialité</a>
+      <a href="mailto:info@scgtech-ai.lu">Contact</a>
+    </div>
+    <p class="copyright">© 2025 SCG Tech AI · Cabinet BPM & Intelligence Artificielle · Luxembourg</p>
+  </div>
+</footer>
+
+</body>
+</html>
