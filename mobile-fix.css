@@ -1,0 +1,135 @@
+/* =============================================
+   MOBILE FIX PATCH — scgtech-ai.lu
+   À coller dans votre fichier CSS principal
+   ou dans un <style> dans le <head> de index.html
+   ============================================= */
+
+/* ── 1. Prévention overflow global ── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* ── 2. Hero Section — Fix mobile ── */
+@media (max-width: 768px) {
+
+  /* Container principal du hero */
+  .hero,
+  #hero,
+  section.hero,
+  .hero-section {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  /* Titre principal — réduction taille */
+  .hero h1,
+  .hero-title,
+  #hero h1 {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+    line-height: 1.15 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Sous-titre / description */
+  .hero p,
+  .hero-desc,
+  .hero-subtitle {
+    font-size: clamp(0.95rem, 3.5vw, 1.1rem) !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Boutons CTA — empilement vertical sur mobile */
+  .hero .cta-group,
+  .hero .btn-group,
+  .hero-btns,
+  .cta-buttons {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .hero .btn,
+  .hero a.btn,
+  .hero .cta-btn,
+  .hero [class*="btn"] {
+    width: 100% !important;
+    max-width: 320px !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  /* Badge/pill "Luxembourg · BPM · IA" */
+  .hero-badge,
+  .badge,
+  .pill {
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0.7rem !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Texte animé / typewriter */
+  .typed-text,
+  .typewriter,
+  [class*="type"],
+  .rotating-text {
+    font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* Statistiques / compteurs */
+  .stats-row,
+  .counters,
+  .metrics {
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    justify-content: center !important;
+  }
+
+  /* Navigation header sur mobile */
+  nav .nav-links,
+  header nav ul {
+    display: none !important; /* géré par votre menu burger existant */
+  }
+}
+
+/* ── 3. Fix Navbar overflow ── */
+@media (max-width: 1024px) {
+  header,
+  nav,
+  .navbar {
+    overflow-x: hidden !important;
+  }
+
+  .nav-inner,
+  .header-inner {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* ── 4. Fix sections générales ── */
+@media (max-width: 768px) {
+  section {
+    padding-left: clamp(1rem, 4vw, 1.5rem) !important;
+    padding-right: clamp(1rem, 4vw, 1.5rem) !important;
+  }
+
+  .container,
+  .wrapper,
+  .section-inner {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
