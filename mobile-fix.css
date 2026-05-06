@@ -82,4 +82,29 @@ html, body {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
+  .hero-inner {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    padding: 0 1.25rem !important;
+  }
+
+  .hero-inner h1,
+  .hero-sub,
+  .hero-intro,
+  .hero-badge {
+    text-align: center !important;
+    max-width: 100% !important;
+  }
+
+  .hero-btns {
+    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .btn-p, .btn-o {
+    width: 100% !important;
+    max-width: 300px !important;
+    text-align: center !important;
+  }
 }
